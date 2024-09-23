@@ -67,9 +67,11 @@ ENV SENTRY_ORG=$SENTRY_ORG
 ARG SENTRY_PROJECT
 ENV SENTRY_PROJECT=$SENTRY_PROJECT
 
-# Accept build id as NEXT_PUBLIC_BUILD_ID
+
+# Accept build id as NEXT_PUBLIC_BUILD_ID or PORTER_NEXT_PUBLIC_BUILD_ID
+ARG PORTER_NEXT_PUBLIC_BUILD_ID
 ARG NEXT_PUBLIC_BUILD_ID
-ENV NEXT_PUBLIC_BUILD_ID=$NEXT_PUBLIC_BUILD_ID
+ENV NEXT_PUBLIC_BUILD_ID=${PORTER_NEXT_PUBLIC_BUILD_ID:-$NEXT_PUBLIC_BUILD_ID}
 
 # Copy source code of isolated subworkspace
 COPY --from=pruner /app/out/full/ .
@@ -82,9 +84,6 @@ RUN rm -f ./web/src/middleware.ts
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV NEXT_MANUAL_SIG_HANDLE true
-# set the CI flag to true to get CI specific logs
-ENV CI true
-
 
 RUN NODE_OPTIONS='--max-old-space-size=4096' turbo run build --filter=web
 
